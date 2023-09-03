@@ -1,0 +1,25 @@
+﻿@model KESKO_task1.Models.IndexModel
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link href="@Url.Content("~/css/style.css")" rel="stylesheet" type="text/css" />
+
+<div class="view">
+    <div class="row form-horizontal">
+        <div class="col-md-12">
+            <br/><br/>
+            <h3>Задача 1</h3>
+                @using (Html.BeginForm("RunProcess", "Home"))
+                {
+            <div class="form-group">
+            <p> Запускаем <b>notepad</b></p> 
+            <input type="submit" value="go" class="btn btn-outline-success" />
+            </div>
+                }        
+  </div>
+ </div>
+</div>
+
