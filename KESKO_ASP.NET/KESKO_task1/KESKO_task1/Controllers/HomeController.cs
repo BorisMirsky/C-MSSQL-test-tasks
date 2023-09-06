@@ -1,6 +1,8 @@
 ﻿using KESKO_task1.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using IWshRuntimeLibrary;
+
 
 namespace KESKO_task1.Controllers
 {
@@ -12,10 +14,11 @@ namespace KESKO_task1.Controllers
             return View();
         }
 
-        // ----------------------------- Task1 -------------------------------
         public IActionResult RunProcess()
         {
-            Process.Start("notepad.exe");
+
+            WshShell shell = new WshShell();
+            shell.Run("notepad", 1, true);
             return RedirectToAction("Index");
         }
 
