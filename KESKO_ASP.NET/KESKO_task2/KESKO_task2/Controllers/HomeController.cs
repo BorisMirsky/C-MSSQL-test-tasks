@@ -1,6 +1,7 @@
 ﻿using KESKO_task2.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.IO.MemoryMappedFiles;
+using System.Text;
+using System.Net.Sockets;
 
 
 namespace KESKO_task2.Controllers
@@ -14,42 +15,28 @@ namespace KESKO_task2.Controllers
             return View();
         }
 
-
         public IActionResult PassData(IndexModel model)
         {
             string NumberI = model.NumberI;
             string NumberJ = model.NumberJ;
             string result = (NumberI + " " + NumberJ);
-            char[] message = result.ToCharArray();
-            int size = message.Length;
-            MemoryMappedFile sharedMemory = MemoryMappedFile.CreateOrOpen("MemoryFile", size * 2 + 4);
-            using (MemoryMappedViewAccessor writer = sharedMemory.CreateViewAccessor(0, size * 2 + 4))
-            {
-                writer.Write(0, size);
-                writer.WriteArray<char>(4, message, 0, size);
-            }
-            Thread.Sleep(5000);
-            GetData(model);
+            SendData(result);
             return RedirectToAction("Index");
         }
 
-
-        public IActionResult GetData(IndexModel model)
+        public IActionResult SendData(string data)
         {
-            char[] message;
-            int size;
-            MemoryMappedFile sharedMemory = MemoryMappedFile.OpenExisting("MemoryFile");
-            using (MemoryMappedViewAccessor reader = sharedMemory.CreateViewAccessor(0, 4, MemoryMappedFileAccess.Read))
-            {
-                size = reader.ReadInt32(0);
-            }
-            using (MemoryMappedViewAccessor reader = sharedMemory.CreateViewAccessor(4, size * 2, MemoryMappedFileAccess.Read))
-            {
-                message = new char[size];
-                reader.ReadArray<char>(0, message, 0, size);
-            }
-            string charsStr = new string(message);
-            HttpContext.Session.SetString("res", charsStr);
+            using TcpClient tcpClient = new TcpClient();
+            tcpClient.Connect("127.0.0.1", 8888);
+            var stream = tcpClient.GetStream();
+            byte[] data1 = Encoding.UTF8.GetBytes(data + '\n');
+            stream.Write(data1);
+            // get data back
+            string SessionValue;
+            byte[] data2 = new byte[1024];  
+            int bytes = stream.Read(data2);
+            SessionValue = Encoding.UTF8.GetString(data2, 0, bytes);
+            HttpContext.Session.SetString("Result", SessionValue);
             return RedirectToAction("Index");
         }
     }

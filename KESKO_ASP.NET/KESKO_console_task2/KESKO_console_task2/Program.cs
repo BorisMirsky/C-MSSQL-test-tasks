@@ -1,4 +1,6 @@
-﻿using System.IO.MemoryMappedFiles;
+﻿using System.Net.Sockets;
+using System.Text;
+using System.Net;
 
 
 namespace KESKO_console_task2
@@ -7,33 +9,43 @@ namespace KESKO_console_task2
     {
         static void Main()
         {
-            char[] message;
-            int size;
-            MemoryMappedFile sharedMemory = MemoryMappedFile.OpenExisting("MemoryFile");
-            using (MemoryMappedViewAccessor reader = sharedMemory.CreateViewAccessor(0, 4, MemoryMappedFileAccess.Read))
+            GetData();
+        }
+
+        //Server
+        static void GetData()
+        {
+            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+            var tcpListener = new TcpListener(localAddr, 8888);  //IPAddress.Any
+            try
             {
-                size = reader.ReadInt32(0);
+                tcpListener.Start();
+                Console.WriteLine("Server is running. Wait connection ");
+                while (true)
+                {
+                    using var tcpClient = tcpListener.AcceptTcpClient();
+                    var stream = tcpClient.GetStream();
+                    byte[] data = new byte[1024];  //512
+                    int bytes = stream.Read(data);
+                    string data1 = Encoding.UTF8.GetString(data, 0, bytes);
+                    Console.WriteLine(data1);
+                    string[] subs = data1.Split(' ');
+                    double NumberI = Convert.ToDouble(subs[0]);
+                    double NumberJ = Convert.ToDouble(subs[1]);
+                    double result = NumberI * NumberJ;
+                    Console.WriteLine(result);
+                    // send responce
+                    stream.Write(Encoding.UTF8.GetBytes(result.ToString()));
+                }
             }
-            using (MemoryMappedViewAccessor reader = sharedMemory.CreateViewAccessor(4, size * 2, MemoryMappedFileAccess.Read))
+            catch (Exception ex)
             {
-                message = new char[size];
-                reader.ReadArray<char>(0, message, 0, size);
+                Console.WriteLine(ex.Message);
             }
-            string charsStr = new string(message);
-            string[] splitted = charsStr.Split(' ');
-            int NumI = Convert.ToInt32(splitted[0]);
-            int NumJ = Convert.ToInt32(splitted[1]);
-            int result = NumI + NumJ;
-            //---------------------------------------------------
-            char[] message1 = result.ToString().ToCharArray();
-            int size1 = message1.Length;
-            MemoryMappedFile sharedMemory1 = MemoryMappedFile.CreateOrOpen("MemoryFile", size1 * 2 + 4);
-            using (MemoryMappedViewAccessor writer1 = sharedMemory1.CreateViewAccessor(0, size1 * 2 + 4))
+            finally
             {
-                writer1.Write(0, size1);
-                writer1.WriteArray<char>(4, message1, 0, size1);
+                tcpListener.Stop();
             }
         }
     }
 }
-

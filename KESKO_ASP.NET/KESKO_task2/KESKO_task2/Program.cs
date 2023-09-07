@@ -1,11 +1,9 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
-
-
 // for to use httpcontext.session
-builder.Services.AddDistributedMemoryCache(); // добавили
-builder.Services.AddSession();                // добавили сервисы сессии
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();   // добавили
+builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddSession();               
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();  
 //     + app.UseSession();   below
 
 
