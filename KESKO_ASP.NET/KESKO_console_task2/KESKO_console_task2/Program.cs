@@ -25,7 +25,7 @@ namespace KESKO_console_task2
                 {
                     using var tcpClient = tcpListener.AcceptTcpClient();
                     var stream = tcpClient.GetStream();
-                    byte[] data = new byte[1024];  //512
+                    byte[] data = new byte[1024];  
                     int bytes = stream.Read(data);
                     string data1 = Encoding.UTF8.GetString(data, 0, bytes);
                     Console.WriteLine(data1);

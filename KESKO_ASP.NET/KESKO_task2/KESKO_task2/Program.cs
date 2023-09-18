@@ -21,7 +21,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();  //
+app.UseSession();  // added
 
 app.UseAuthorization();
 
