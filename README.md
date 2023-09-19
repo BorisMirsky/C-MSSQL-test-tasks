@@ -1,4 +1,4 @@
-# C-MSSQL-test-tasks
+# CSharp-MSSQL-test-tasks
 
 README и Текст_задания лежат:
 - для Задания_1 в папке KESKO_ASP.NET.\
